@@ -19,14 +19,14 @@ variable "service_plan_id" {
 }
 
 variable "ip_restrictions" {
+  description = "IP restrictions for the App Service."
   type = list(object({
-    name        = string
-    ip_address  = optional(string)
-    service_tag = optional(string)
-    action      = string
-    priority    = number
+    name        = string           # Name of the rule
+    ip_address  = optional(string) # IP address can be null
+    service_tag = optional(string) # Service tag can be null
+    action      = string           # Action: Allow or Deny
+    priority    = number           # Priority for the rule
   }))
-  description = "List of IP restrictions applied to the App Service."
 }
 
 variable "tags" {

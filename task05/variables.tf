@@ -34,3 +34,14 @@ variable "traffic_manager" {
   })
 }
 
+variable "ip_restrictions" {
+  description = "List of IP restrictions applied to the App Services."
+  type = list(object({
+    name        = string           # Rule name
+    ip_address  = optional(string) # Restrict to specific IP address (optional)
+    service_tag = optional(string) # Restrict to Azure Service tag (optional)
+    action      = string           # Allow or Deny
+    priority    = number           # Priority of the rule
+  }))
+}
+

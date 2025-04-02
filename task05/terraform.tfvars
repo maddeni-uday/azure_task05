@@ -49,3 +49,28 @@ traffic_manager = {
   routing_method = "Performance"
   tags           = { Creator = "maddeni_uday@epam.com" }
 }
+
+# Add missing IP restriction configurations
+ip_restrictions = [
+  {
+    name        = "allow-ip" # Access restriction name for specific IP
+    action      = "Allow"
+    ip_address  = "18.153.146.156/32" # Verification agent IP
+    service_tag = null
+    priority    = 65000
+  },
+  {
+    name        = "allow-tm" # Access restriction name for Traffic Manager
+    action      = "Allow"
+    ip_address  = null
+    service_tag = "AzureTrafficManager"
+    priority    = 65000
+  },
+  {
+    name        = "deny-all" # Default deny rule
+    action      = "Deny"
+    ip_address  = "0.0.0.0/0"
+    service_tag = null
+    priority    = 2147483647
+  }
+]

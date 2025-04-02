@@ -47,12 +47,8 @@ module "app1" {
   location            = module.rg1.location
   resource_group_name = module.rg1.name
   service_plan_id     = module.asp1.id
-  ip_restrictions = [
-    { name = "allow-ip", action = "Allow", ip_address = "18.153.146.156/32", service_tag = null, priority = 65000 },
-    { name = "allow-tm", action = "Allow", service_tag = "AzureTrafficManager", ip_address = null, priority = 65000 },
-    { name = "deny-all", ip_address = "0.0.0.0/0", service_tag = null, action = "Deny", priority = 2147483647 }
-  ]
-  tags = var.app_services["app1"].tags
+  ip_restrictions     = var.ip_restrictions # Pass from terraform.tfvars
+  tags                = var.app_services["app1"].tags
 }
 
 module "app2" {
@@ -61,12 +57,8 @@ module "app2" {
   location            = module.rg2.location
   resource_group_name = module.rg2.name
   service_plan_id     = module.asp2.id
-  ip_restrictions = [
-    { name = "allow-ip", action = "Allow", ip_address = "18.153.146.156/32", service_tag = null, priority = 65000 },
-    { name = "allow-tm", action = "Allow", service_tag = "AzureTrafficManager", ip_address = null, priority = 65000 },
-    { name = "deny-all", ip_address = "0.0.0.0/0", service_tag = null, action = "Deny", priority = 2147483647 }
-  ]
-  tags = var.app_services["app2"].tags
+  ip_restrictions     = var.ip_restrictions # Pass from terraform.tfvars
+  tags                = var.app_services["app2"].tags
 }
 
 # Reference Traffic Manager Module
