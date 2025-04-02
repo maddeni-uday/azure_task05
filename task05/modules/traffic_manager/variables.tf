@@ -1,39 +1,34 @@
 variable "name" {
+  description = "The name of the Traffic Manager profile"
   type        = string
-  description = "The name of the Traffic Manager profile."
 }
 
 variable "resource_group_name" {
+  description = "The name of the resource group in which to create the Traffic Manager profile"
   type        = string
-  description = "The name of the resource group where the Traffic Manager profile is created."
+}
+
+variable "location" {
+  description = "The Azure location where the Traffic Manager profile should exist"
+  type        = string
 }
 
 variable "routing_method" {
+  description = "The routing method of the Traffic Manager profile"
   type        = string
-  description = "The routing method for Traffic Manager, e.g., Performance, Priority, Weighted."
 }
 
-# variable "endpoints" {
-#   type = list(object({
-#     name     = string # Endpoint name
-#     type     = string # Endpoint type
-#     target   = string # Target resource (e.g., App Service URL)
-#     priority = number # Priority of routing
-#   }))
-#   description = "List of endpoints for the Traffic Manager profile."
-# }
-
-
 variable "endpoints" {
+  description = "List of endpoints to add to the Traffic Manager profile"
   type = list(object({
-    name     = string
-    target   = string
-    priority = number
+    name    = string
+    target  = string
+    enabled = bool
   }))
-  description = "value"
 }
 
 variable "tags" {
+  description = "A mapping of tags to assign to the resource"
   type        = map(string)
-  description = "Tags to associate with the Traffic Manager profile."
+  default     = {}
 }

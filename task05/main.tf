@@ -1,85 +1,60 @@
-# Reference Resource Group Modules
-module "rg1" {
+# Create Resource Groups
+module "resource_groups" {
+  for_each = var.resource_groups
   source   = "./modules/resource_group"
-  name     = var.resource_groups["rg1"].name
-  location = var.resource_groups["rg1"].location
-  tags     = var.resource_groups["rg1"].tags
+
+  name     = each.value.name
+  location = each.value.location
+  tags     = var.tags
 }
 
-module "rg2" {
-  source   = "./modules/resource_group"
-  name     = var.resource_groups["rg2"].name
-  location = var.resource_groups["rg2"].location
-  tags     = var.resource_groups["rg2"].tags
+# Create App Service Plans
+module "app_service_plans" {
+  for_each = var.app_service_plans
+  source   = "./modules/app_service_plan"
+
+  name                = each.value.name
+  resource_group_name = module.resource_groups[each.value.resource_group_key].name
+  location            = module.resource_groups[each.value.resource_group_key].location
+  sku                 = each.value.sku
+  worker_count        = each.value.worker_count
+  tags                = var.tags
 }
 
-module "rg3" {
-  source   = "./modules/resource_group"
-  name     = var.resource_groups["rg3"].name
-  location = var.resource_groups["rg3"].location
-  tags     = var.resource_groups["rg3"].tags
-}
-module "asp1" {
-  source              = "./modules/app_service_plan"
-  name                = var.app_service_plans["asp1"].name
-  location            = module.rg1.location
-  resource_group_name = module.rg1.name
-  sku                 = var.app_service_plans["asp1"].sku
-  worker_count        = var.app_service_plans["asp1"].worker_count
-  os_type             = "Windows"
-  tags                = var.app_service_plans["asp1"].tags
+# Create App Services
+module "app_services" {
+  for_each = var.app_services
+  source   = "./modules/app_service"
+
+  name                 = each.value.name
+  resource_group_name  = module.resource_groups[each.value.resource_group_key].name
+  location             = module.resource_groups[each.value.resource_group_key].location
+  service_plan_id      = module.app_service_plans[each.value.app_service_plan_key].id
+  allowed_ip           = var.allowed_ip
+  ip_restriction_rules = var.ip_restriction_rules
+  tags                 = var.tags
 }
 
-module "asp2" {
-  source              = "./modules/app_service_plan"
-  name                = var.app_service_plans["asp2"].name
-  location            = module.rg2.location
-  resource_group_name = module.rg2.name
-  sku                 = var.app_service_plans["asp2"].sku
-  worker_count        = var.app_service_plans["asp2"].worker_count
-  os_type             = "Windows"
-  tags                = var.app_service_plans["asp2"].tags
-}
-
-module "app1" {
-  source              = "./modules/app_service"
-  name                = var.app_services["app1"].name
-  location            = module.rg1.location
-  resource_group_name = module.rg1.name
-  service_plan_id     = module.asp1.id
-  ip_restrictions     = var.ip_restrictions # Pass from terraform.tfvars
-  tags                = var.app_services["app1"].tags
-}
-
-module "app2" {
-  source              = "./modules/app_service"
-  name                = var.app_services["app2"].name
-  location            = module.rg2.location
-  resource_group_name = module.rg2.name
-  service_plan_id     = module.asp2.id
-  ip_restrictions     = var.ip_restrictions # Pass from terraform.tfvars
-  tags                = var.app_services["app2"].tags
-}
-
-# Reference Traffic Manager Module
+# Create Traffic Manager Profile
 module "traffic_manager" {
-  source              = "./modules/traffic_manager"
+  source = "./modules/traffic_manager"
+
   name                = var.traffic_manager.name
-  resource_group_name = module.rg3.name # RG3 provides the resource group for the Traffic Manager profile
+  resource_group_name = module.resource_groups[var.traffic_manager.resource_group_key].name
+  location            = module.resource_groups[var.traffic_manager.resource_group_key].location
   routing_method      = var.traffic_manager.routing_method
+  tags                = var.tags
+
   endpoints = [
     {
-      name     = module.app1.name
-      type     = "azureEndpoints"
-      target   = module.app1.resource_id
-      priority = 1
+      name    = "${var.app_services["app1"].name}-endpoint"
+      target  = module.app_services["app1"].id
+      enabled = true
     },
     {
-      name     = module.app2.name
-      type     = "azureEndpoints"
-      target   = module.app2.resource_id
-      priority = 2
+      name    = "${var.app_services["app2"].name}-endpoint"
+      target  = module.app_services["app2"].id
+      enabled = true
     }
   ]
-  tags = var.traffic_manager.tags
 }

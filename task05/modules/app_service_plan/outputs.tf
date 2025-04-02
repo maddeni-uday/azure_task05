@@ -1,9 +1,9 @@
 output "id" {
-  value       = azurerm_service_plan.app_service_plan.id
-  description = "The ID of the created App Service Plan."
+  description = "The ID of the App Service Plan"
+  value       = azurerm_service_plan.asp.id
 }
 
 output "name" {
-  value       = azurerm_service_plan.app_service_plan.name
-  description = "The name of the App Service Plan."
+  description = "The name of the App Service Plan"
+  value       = azurerm_service_plan.asp.name
 }
